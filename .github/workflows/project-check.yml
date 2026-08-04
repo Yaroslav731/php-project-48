@@ -1,0 +1,48 @@
+name: Project CI & Sonar Analysis
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    name: Build, Test and Sonar Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Клонируем репозиторий с полной историей коммитов (нужно для SonarCloud)
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Настраиваем окружение PHP и активируем Xdebug для сбора coverage
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: xdebug
+
+      # 3. Устанавливаем зависимости Composer
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # 4. Запускаем проверку стиля кода
+      - name: Run Linter
+        run: make lint
+
+      # 5. Запускаем тесты с генерацией отчета о покрытии
+      - name: Run Tests with Coverage
+        run: make test-coverage
+
+      # 6. Передаем результаты анализа и покрытия в SonarCloud
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.php.coverage.reportPaths=build/logs/clover.xml
