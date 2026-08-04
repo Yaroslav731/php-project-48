@@ -1,0 +1,22 @@
+{
+    "name": "hexlet/code",
+    "autoload": {
+        "psr-4": {
+            "Hexlet\\Code\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ярослав Гончаров",
+            "email": "yaroslav.x111@gmail.com"
+        }
+    ],
+    "require": {
+        "docopt/docopt": "^1.0",
+        "funct/funct": "^1.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5",
+        "squizlabs/php_codesniffer": "^4.0"
+    }
+}
