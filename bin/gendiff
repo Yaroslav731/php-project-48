@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+
+use function Parses\Files\parses;
+
+$autoloadPath1 = __DIR__ . '/../../../autoload.php';
+$autoloadPath2 = __DIR__ . '/../vendor/autoload.php';
+
+require_once __DIR__ . '/../src/Parses.php';
+
+if (file_exists($autoloadPath1)) {
+    require_once $autoloadPath1;
+} else {
+    require_once $autoloadPath2;
+}
+
+$doc = <<<DOC
+Generate diff
+
+Usage:
+  gendiff (-h|--help)
+  gendiff (-v|--version)
+  gendiff [--format <fmt>] <firstFile> <secondFile>
+  gendiff <firstFile> <secondFile>
+
+Options:
+  -h --help                     Show this screen
+  -v --version                  Show version
+  --format <fmt>                Report format [default: stylish]
+
+DOC;
+
+$argc = Docopt::handle($doc);
+
+$firstFilePath = $argc['<firstFile>'];
+$secondFilePath = $argc['<secondFile>'];
+
+$content1 = file_get_contents($firstFilePath);
+$format1 = pathinfo($firstFilePath, PATHINFO_EXTENSION);
+$data1 = parses($content1, $format1);
+
+$content2 = file_get_contents($secondFilePath);
+$format2 = pathinfo($secondFilePath, PATHINFO_EXTENSION);
+$data2 = parses($content2, $format2);
+
+print_r($data1);
+print_r($data2);
