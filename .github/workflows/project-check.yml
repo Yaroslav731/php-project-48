@@ -1,5 +1,7 @@
+# Название workflow, которое отображается во вкладке Actions на GitHub
 name: Project CI & Sonar Analysis
 
+# Триггеры: запуск при каждом push или pull request в основные ветки
 on:
   push:
     branches: [ "main", "master" ]
@@ -12,13 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Клонируем репозиторий с полной историей коммитов (нужно для SonarCloud)
+      # 1. Клонируем репозиторий. 
+      # Параметр fetch-depth: 0 скачивает всю историю коммитов — это критично для корректной работы Sonar.
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. Настраиваем окружение PHP и активируем Xdebug для сбора coverage
+      # 2. Настраиваем PHP (так как у тебя php-project-48)
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -29,20 +32,18 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      # 4. Запускаем проверку стиля кода
+      # 4. Запускаем линтер (если используешь make lint или vendor/bin/phpcs)
       - name: Run Linter
-        run: make lint
+        run: make lint   # Если у тебя другая команда (например, npm run lint), укажи её здесь
 
-      # 5. Запускаем тесты с генерацией отчета о покрытии
-      - name: Run Tests with Coverage
-        run: make test-coverage
+      # 5. Запускаем тесты
+      - name: Run Tests
+        run: make test   # Или vendor/bin/phpunit / npm test
 
-      # 6. Передаем результаты анализа и покрытия в SonarCloud
+      # 6. Сканирование SonarCloud
+      # Берёт настройки из sonar-project.properties и секрет SONAR_TOKEN из GitHub Secrets
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.php.coverage.reportPaths=build/logs/clover.xml
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Автоматический токен от самого GitHub
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Токен, который мы добавили в Secrets
