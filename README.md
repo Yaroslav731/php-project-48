@@ -7,3 +7,6 @@
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/Yaroslav731/php-project-48/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Yaroslav731/php-project-48/actions)
+
+### Дeмонстрация работы (Ascinema):
+[![asciicast](https://asciinema.org/a/GSiAWzYmVHMcjkF9.svg)](https://asciinema.org/a/GSiAWzYmVHMcjkF9)
