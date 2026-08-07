@@ -35,6 +35,17 @@ $argc = Docopt::handle($doc);
 $firstFilePath = $argc['<firstFile>'];
 $secondFilePath = $argc['<secondFile>'];
 
+require_once __DIR__ . '/../src/Difer.php';
+
+use function Differ\Files\differ;
+
+print_local(differ($firstFilePath, $secondFilePath) . PHP_EOL);
+
+function print_local(string $string): void
+{
+  echo $string;
+}
+
 $content1 = file_get_contents($firstFilePath);
 $format1 = pathinfo($firstFilePath, PATHINFO_EXTENSION);
 $data1 = parses($content1, $format1);
